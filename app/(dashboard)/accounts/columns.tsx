@@ -1,5 +1,6 @@
 'use client'
 
+import { Actions } from '@/app/(dashboard)/accounts/actions'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { client } from '@/lib/hono'
@@ -49,8 +50,8 @@ export const columns: ColumnDef<ResposeType>[] = [
       )
     },
   },
-  // {
-  //   id: "actions",
-  //   cell: ({ row }) => <Actions />
-  // }
+  {
+    id: 'actions',
+    cell: ({ row }) => <Actions id={row.original.id} />,
+  },
 ]
