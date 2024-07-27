@@ -49,4 +49,8 @@ export const columns: ColumnDef<ResposeType>[] = [
       )
     },
   },
+  // {
+  //   id: "actions",
+  //   cell: ({ row }) => <Actions />
+  // }
 ]
