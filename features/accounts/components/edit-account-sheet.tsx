@@ -51,6 +51,7 @@ export const EditAccountSheet = () => {
           <AccountForm
             id={id}
             onSubmit={onSubmit}
+            disabled={mutation.isPending}
             defaultValues={defaultValues}
           />
         )}
