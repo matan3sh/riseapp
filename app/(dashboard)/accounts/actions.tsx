@@ -19,7 +19,7 @@ export const Actions = ({ id }: Props) => {
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <Button variant={'ghost'} className="size-8 p-0">
             <MoreHorizontal className="size-4" />
