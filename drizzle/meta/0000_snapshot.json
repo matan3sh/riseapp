@@ -1,7 +1,7 @@
 {
-  "id": "ed6e7839-8848-4a62-9f2e-235ffc8ed7f1",
+  "id": "fa6a44c2-b89c-4357-8225-d4ef59d6b68d",
   "prevId": "00000000-0000-0000-0000-000000000000",
-  "version": "7",
+  "version": "6",
   "dialect": "postgresql",
   "tables": {
     "public.accounts": {
@@ -38,8 +38,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "public.update": {
-      "name": "update",
+    "public.categories": {
+      "name": "categories",
       "schema": "",
       "columns": {
         "id": {
@@ -48,11 +48,23 @@
           "primaryKey": true,
           "notNull": true
         },
+        "plaid_id": {
+          "name": "plaid_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "name": {
           "name": "name",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
