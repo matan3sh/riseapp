@@ -28,7 +28,7 @@ export const EditCategorySheet = () => {
     'You are about to delete this category.'
   )
 
-  const accountQuery = useGetCategory(id)
+  const categoryQuery = useGetCategory(id)
   const editMutation = useEditCategory(id)
   const deleteMutation = useDeleteCategory(id)
 
@@ -49,9 +49,9 @@ export const EditCategorySheet = () => {
   }
 
   const isPending = editMutation.isPending || deleteMutation.isPending
-  const isLoading = accountQuery.isLoading
-  const defaultValues = accountQuery.data
-    ? { name: accountQuery.data.name }
+  const isLoading = categoryQuery.isLoading
+  const defaultValues = categoryQuery.data
+    ? { name: categoryQuery.data.name }
     : { name: '' }
 
   return (
