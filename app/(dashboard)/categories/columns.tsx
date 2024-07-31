@@ -1,6 +1,6 @@
 'use client'
 
-import { Actions } from '@/app/(dashboard)/accounts/actions'
+import { Actions } from '@/app/(dashboard)/categories/actions'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { client } from '@/lib/hono'
@@ -9,7 +9,7 @@ import { InferResponseType } from 'hono'
 import { ArrowUpDown } from 'lucide-react'
 
 export type ResposeType = InferResponseType<
-  typeof client.api.accounts.$get,
+  typeof client.api.categories.$get,
   200
 >['data'][0]
 

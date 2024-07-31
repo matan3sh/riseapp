@@ -1,6 +1,6 @@
 'use client'
 
-import { columns } from '@/app/(dashboard)/accounts/columns'
+import { columns } from '@/app/(dashboard)/categories/columns'
 import { DataTable } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'

@@ -6,11 +6,11 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { insertCategorySchema } from '@/db/schema'
-import { useOpenAccount } from '@/features/accounts/hooks/use-open-account'
 import { useDeleteCategory } from '@/features/categories/api/use-delete-category'
 import { useEditCategory } from '@/features/categories/api/use-edit-category'
 import { useGetCategory } from '@/features/categories/api/use-get-category'
 import { CategoryForm } from '@/features/categories/components/category-form'
+import { useOpenCategory } from '@/features/categories/hooks/use-open-category'
 import { useConfirm } from '@/hooks/use-confirm'
 import { Loader2 } from 'lucide-react'
 import { z } from 'zod'
@@ -22,7 +22,7 @@ const formSchema = insertCategorySchema.pick({
 type FormValues = z.infer<typeof formSchema>
 
 export const EditCategorySheet = () => {
-  const { isOpen, onClose, id } = useOpenAccount()
+  const { isOpen, onClose, id } = useOpenCategory()
   const [ConfirmDialog, confirm] = useConfirm(
     'Are you sure?',
     'You are about to delete this category.'
