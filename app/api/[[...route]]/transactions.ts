@@ -1,7 +1,13 @@
 import { db } from '@/db/drizzle'
-import { accounts, categories, trancactions } from '@/db/schema'
+import {
+  accounts,
+  categories,
+  insertTransactionSchema,
+  transactions,
+} from '@/db/schema'
 import { clerkMiddleware, getAuth } from '@hono/clerk-auth'
 import { zValidator } from '@hono/zod-validator'
+import { createId } from '@paralleldrive/cuid2'
 import { parse, subDays } from 'date-fns'
 import { and, desc, eq, gte, lte } from 'drizzle-orm'
 import { Hono } from 'hono'
@@ -37,28 +43,28 @@ const app = new Hono()
 
       const data = await db
         .select({
-          id: trancactions.id,
-          date: trancactions.date,
+          id: transactions.id,
+          date: transactions.date,
           category: categories.name,
-          categoryId: trancactions.categoryId,
-          payee: trancactions.payee,
-          amount: trancactions.amount,
-          notes: trancactions.notes,
+          categoryId: transactions.categoryId,
+          payee: transactions.payee,
+          amount: transactions.amount,
+          notes: transactions.notes,
           account: accounts.name,
-          accountId: trancactions.accountId,
+          accountId: transactions.accountId,
         })
-        .from(trancactions)
-        .innerJoin(accounts, eq(trancactions.accountId, accounts.id))
-        .leftJoin(categories, eq(trancactions.categoryId, categories.id))
+        .from(transactions)
+        .innerJoin(accounts, eq(transactions.accountId, accounts.id))
+        .leftJoin(categories, eq(transactions.categoryId, categories.id))
         .where(
           and(
-            accountId ? eq(trancactions.accountId, accountId) : undefined,
+            accountId ? eq(transactions.accountId, accountId) : undefined,
             eq(accounts.userId, auth.userId),
-            gte(trancactions.date, startDate),
-            lte(trancactions.date, endDate)
+            gte(transactions.date, startDate),
+            lte(transactions.date, endDate)
           )
         )
-        .orderBy(desc(trancactions.date))
+        .orderBy(desc(transactions.date))
 
       return c.json({ data })
     }
@@ -82,17 +88,17 @@ const app = new Hono()
 
       const [data] = await db
         .select({
-          id: trancactions.id,
-          date: trancactions.date,
-          categoryId: trancactions.categoryId,
-          payee: trancactions.payee,
-          amount: trancactions.amount,
-          notes: trancactions.notes,
-          accountId: trancactions.accountId,
+          id: transactions.id,
+          date: transactions.date,
+          categoryId: transactions.categoryId,
+          payee: transactions.payee,
+          amount: transactions.amount,
+          notes: transactions.notes,
+          accountId: transactions.accountId,
         })
-        .from(trancactions)
-        .innerJoin(accounts, eq(trancactions.accountId, accounts.id))
-        .where(and(eq(trancactions.id, id), eq(accounts.userId, auth.userId)))
+        .from(transactions)
+        .innerJoin(accounts, eq(transactions.accountId, accounts.id))
+        .where(and(eq(transactions.id, id), eq(accounts.userId, auth.userId)))
 
       if (!data) {
         return c.json({ error: 'Not found' }, 404)
@@ -102,35 +108,34 @@ const app = new Hono()
     }
   )
 
-// .post(
-//   '/',
-//   clerkMiddleware(),
-//   zValidator(
-//     'json',
-//     insertCategorySchema.pick({
-//       name: true,
-//     })
-//   ),
-//   async (c) => {
-//     const auth = getAuth(c)
-//     const values = c.req.valid('json')
+  .post(
+    '/',
+    clerkMiddleware(),
+    zValidator(
+      'json',
+      insertTransactionSchema.omit({
+        id: true,
+      })
+    ),
+    async (c) => {
+      const auth = getAuth(c)
+      const values = c.req.valid('json')
 
-//     if (!auth?.userId) {
-//       return c.json({ error: 'Unauthorized' }, 401)
-//     }
+      if (!auth?.userId) {
+        return c.json({ error: 'Unauthorized' }, 401)
+      }
 
-//     const [data] = await db
-//       .insert(categories)
-//       .values({
-//         id: createId(),
-//         userId: auth.userId,
-//         ...values,
-//       })
-//       .returning()
+      const [data] = await db
+        .insert(transactions)
+        .values({
+          id: createId(),
+          ...values,
+        })
+        .returning()
 
-//     return c.json({ data })
-//   }
-// )
+      return c.json({ data })
+    }
+  )
 
 // .post(
 //   '/bulk-delete',

@@ -11,7 +11,7 @@ export const accounts = pgTable('accounts', {
 })
 
 export const accountsRelations = relations(accounts, ({ many }) => ({
-  trancactions: many(trancactions),
+  trancactions: many(transactions),
 }))
 
 export const insertAccountSchema = createInsertSchema(accounts)
@@ -24,12 +24,12 @@ export const categories = pgTable('categories', {
 })
 
 export const categoriesRelations = relations(categories, ({ many }) => ({
-  trancactions: many(trancactions),
+  trancactions: many(transactions),
 }))
 
 export const insertCategorySchema = createInsertSchema(categories)
 
-export const trancactions = pgTable('transactions', {
+export const transactions = pgTable('transactions', {
   id: text('id').primaryKey(),
   amount: integer('amount').notNull(),
   payee: text('payee').notNull(),
@@ -45,17 +45,17 @@ export const trancactions = pgTable('transactions', {
   }),
 })
 
-export const transactionsRelations = relations(trancactions, ({ one }) => ({
+export const transactionsRelations = relations(transactions, ({ one }) => ({
   account: one(accounts, {
-    fields: [trancactions.accountId],
+    fields: [transactions.accountId],
     references: [accounts.id],
   }),
   categories: one(categories, {
-    fields: [trancactions.categoryId],
+    fields: [transactions.categoryId],
     references: [categories.id],
   }),
 }))
 
-export const insertTransactionSchema = createInsertSchema(trancactions, {
+export const insertTransactionSchema = createInsertSchema(transactions, {
   date: z.coerce.date(),
 })
