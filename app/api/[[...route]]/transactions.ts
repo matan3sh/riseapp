@@ -179,37 +179,51 @@ const app = new Hono()
     }
   )
 
-// .patch(
-//   '/:id',
-//   clerkMiddleware(),
-//   zValidator('param', z.object({ id: z.string().optional() })),
-//   zValidator('json', insertCategorySchema.pick({ name: true })),
-//   async (c) => {
-//     const auth = getAuth(c)
-//     const { id } = c.req.valid('param')
-//     const values = c.req.valid('json')
+  .patch(
+    '/:id',
+    clerkMiddleware(),
+    zValidator('param', z.object({ id: z.string().optional() })),
+    zValidator('json', insertTransactionSchema.omit({ id: true })),
+    async (c) => {
+      const auth = getAuth(c)
+      const { id } = c.req.valid('param')
+      const values = c.req.valid('json')
 
-//     if (!id) {
-//       return c.json({ error: 'Missing id' }, 400)
-//     }
+      if (!id) {
+        return c.json({ error: 'Missing id' }, 400)
+      }
 
-//     if (!auth?.userId) {
-//       return c.json({ error: 'Unauthorized' }, 401)
-//     }
+      if (!auth?.userId) {
+        return c.json({ error: 'Unauthorized' }, 401)
+      }
 
-//     const [data] = await db
-//       .update(categories)
-//       .set(values)
-//       .where(and(eq(categories.userId, auth.userId), eq(categories.id, id)))
-//       .returning()
+      const transactionsToUpdate = db.$with('transactions_to_update').as(
+        db
+          .select({ id: transactions.id })
+          .from(transactions)
+          .innerJoin(accounts, eq(transactions.accountId, accounts.id))
+          .where(and(eq(transactions.id, id), eq(accounts.userId, auth.userId)))
+      )
 
-//     if (!data) {
-//       return c.json({ error: 'Not found' }, 404)
-//     }
+      const [data] = await db
+        .with(transactionsToUpdate)
+        .update(transactions)
+        .set(values)
+        .where(
+          inArray(
+            transactions.id,
+            sql`(select id from ${transactionsToUpdate})`
+          )
+        )
+        .returning()
 
-//     return c.json({ data })
-//   }
-// )
+      if (!data) {
+        return c.json({ error: 'Not found' }, 404)
+      }
+
+      return c.json({ data })
+    }
+  )
 
 // .delete(
 //   '/:id',
