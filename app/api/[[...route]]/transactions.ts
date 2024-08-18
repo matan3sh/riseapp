@@ -225,33 +225,47 @@ const app = new Hono()
     }
   )
 
-// .delete(
-//   '/:id',
-//   clerkMiddleware(),
-//   zValidator('param', z.object({ id: z.string().optional() })),
-//   async (c) => {
-//     const auth = getAuth(c)
-//     const { id } = c.req.valid('param')
+  .delete(
+    '/:id',
+    clerkMiddleware(),
+    zValidator('param', z.object({ id: z.string().optional() })),
+    async (c) => {
+      const auth = getAuth(c)
+      const { id } = c.req.valid('param')
 
-//     if (!id) {
-//       return c.json({ error: 'Missing id' }, 400)
-//     }
+      if (!id) {
+        return c.json({ error: 'Missing id' }, 400)
+      }
 
-//     if (!auth?.userId) {
-//       return c.json({ error: 'Unauthorized' }, 401)
-//     }
+      if (!auth?.userId) {
+        return c.json({ error: 'Unauthorized' }, 401)
+      }
 
-//     const [data] = await db
-//       .delete(categories)
-//       .where(and(eq(categories.userId, auth.userId), eq(categories.id, id)))
-//       .returning({ id: categories.id })
+      const transactionsToDelete = db.$with('transactions_to_delete').as(
+        db
+          .select({ id: transactions.id })
+          .from(transactions)
+          .innerJoin(accounts, eq(transactions.accountId, accounts.id))
+          .where(and(eq(transactions.id, id), eq(accounts.userId, auth.userId)))
+      )
 
-//     if (!data) {
-//       return c.json({ error: 'Not found' }, 404)
-//     }
+      const [data] = await db
+        .with(transactionsToDelete)
+        .delete(transactions)
+        .where(
+          inArray(
+            transactions.id,
+            sql`(select id from ${transactionsToDelete})`
+          )
+        )
+        .returning({ id: transactions.id })
 
-//     return c.json({ data })
-//   }
-// )
+      if (!data) {
+        return c.json({ error: 'Not found' }, 404)
+      }
+
+      return c.json({ data })
+    }
+  )
 
 export default app
