@@ -7,7 +7,8 @@ import {
 } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
-import { Calendar as ClendarIcon } from 'lucide-react'
+import { CalendarIcon } from 'lucide-react'
+import { useState } from 'react'
 import { SelectSingleEventHandler } from 'react-day-picker'
 
 type Props = {
@@ -17,26 +18,49 @@ type Props = {
 }
 
 export const DatePicker = ({ value, onChange, disabled }: Props) => {
+  const [isOpen, setIsOpen] = useState(false)
+
+  const handleSelectDate: SelectSingleEventHandler = (
+    day,
+    selectedDay,
+    activeModifiers,
+    e
+  ) => {
+    if (onChange) {
+      onChange(day, selectedDay, activeModifiers, e)
+    }
+    setIsOpen(false)
+  }
+
+  const handleButtonClick = () => {
+    setIsOpen((prev) => !prev)
+  }
+
   return (
-    <Popover>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <Button
           disabled={disabled}
           variant="outline"
+          onClick={handleButtonClick}
           className={cn(
             'w-full justify-start text-left font-normal',
             !value && 'text-muted-foreground'
           )}
         >
-          <ClendarIcon className="size-4 mr-2" />
+          <CalendarIcon className="size-4 mr-2" />
           {value ? format(value, 'PPP') : <span>Pick a date</span>}
         </Button>
       </PopoverTrigger>
-      <PopoverContent>
+      <PopoverContent
+        className="pointer-events-auto"
+        onFocus={(e) => e.stopPropagation()}
+        onBlur={(e) => setIsOpen(false)}
+      >
         <Calendar
           mode="single"
           selected={value}
-          onSelect={onChange}
+          onSelect={handleSelectDate}
           disabled={disabled}
           initialFocus
         />
