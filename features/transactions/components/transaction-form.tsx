@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
+import { AmountInput } from '@/components/amount-input'
 import { DatePicker } from '@/components/date-picker'
 import { Select } from '@/components/select'
 import { Button } from '@/components/ui/button'
@@ -138,6 +139,22 @@ export const TransactionForm = ({
                   disabled={disabled}
                   placeholder="Add a payee"
                   {...field}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <FormField
+          name="amount"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Amount</FormLabel>
+              <FormControl>
+                <AmountInput
+                  {...field}
+                  disabled={disabled}
+                  placeholder="0.00"
                 />
               </FormControl>
             </FormItem>
