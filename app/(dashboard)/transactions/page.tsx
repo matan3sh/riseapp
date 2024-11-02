@@ -1,17 +1,19 @@
 'use client'
 
+import { columns } from '@/app/(dashboard)/transactions/columns'
+import { DataTable } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useBulkCreateTransactions } from '@/features/transactions/api/use-bulk-create-transactions'
-import { useGetTransaction } from '@/features/transactions/api/use-get-transaction'
+import { useBulkDeleteTransactions } from '@/features/transactions/api/use-bulk-delete-transactions'
+import { useGetTransactions } from '@/features/transactions/api/use-get-transactions'
 import { useNewTransaction } from '@/features/transactions/hooks/use-new-transaction'
 import { Loader2, Plus } from 'lucide-react'
 
 const TransactionsPage = () => {
   const newTransaction = useNewTransaction()
-  const deleteTransactions = useBulkCreateTransactions()
-  const transactionsQuery = useGetTransaction()
+  const deleteTransactions = useBulkDeleteTransactions()
+  const transactionsQuery = useGetTransactions()
   const transactions = transactionsQuery.data || []
 
   const isDisabled = transactionsQuery.isLoading || deleteTransactions.isPending
@@ -46,7 +48,7 @@ const TransactionsPage = () => {
           </Button>
         </CardHeader>
         <CardContent>
-          {/* <DataTable
+          <DataTable
             filterKey="name"
             columns={columns}
             data={transactions}
@@ -55,7 +57,7 @@ const TransactionsPage = () => {
               deleteTransactions.mutate({ ids })
             }}
             disabled={isDisabled}
-          /> */}
+          />
         </CardContent>
       </Card>
     </div>
