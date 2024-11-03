@@ -1,6 +1,7 @@
 'use client'
 
 import { Actions } from '@/app/(dashboard)/accounts/actions'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { client } from '@/lib/hono'
@@ -104,7 +105,31 @@ export const columns: ColumnDef<ResposeType>[] = [
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue('amount'))
 
-      return <span>{formatCurrency(amount)}</span>
+      return (
+        <Badge
+          variant={amount < 0 ? 'destructive' : 'primary'}
+          className="text-xs font-medium px-3.5 py-2.5"
+        >
+          {formatCurrency(amount)}
+        </Badge>
+      )
+    },
+  },
+  {
+    accessorKey: 'account',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Account
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: ({ row }) => {
+      return <span>{row.original.account}</span>
     },
   },
   {
