@@ -2,6 +2,7 @@
 
 import { Actions } from '@/app/(dashboard)/accounts/actions'
 import { AccountColumn } from '@/app/(dashboard)/transactions/account-column'
+import { CategoryColumn } from '@/app/(dashboard)/transactions/category-column'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -73,7 +74,13 @@ export const columns: ColumnDef<ResposeType>[] = [
       )
     },
     cell: ({ row }) => {
-      return <span>{row.original.category}</span>
+      return (
+        <CategoryColumn
+          id={row.original.id}
+          category={row.original.category}
+          categoryId={row.original.categoryId}
+        />
+      )
     },
   },
   {
