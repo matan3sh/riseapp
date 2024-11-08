@@ -1,7 +1,7 @@
 'use client'
 
-import { Actions } from '@/app/(dashboard)/accounts/actions'
 import { AccountColumn } from '@/app/(dashboard)/transactions/account-column'
+import { Actions } from '@/app/(dashboard)/transactions/actions'
 import { CategoryColumn } from '@/app/(dashboard)/transactions/category-column'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
