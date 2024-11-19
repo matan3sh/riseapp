@@ -1,6 +1,7 @@
 'use client'
 
 import { columns } from '@/app/(dashboard)/transactions/columns'
+import ImportCard from '@/app/(dashboard)/transactions/import-card'
 import UploadButton from '@/app/(dashboard)/transactions/upload-button'
 import { DataTable } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
@@ -25,6 +26,7 @@ const INITIAL_IMPORT_RESULTS = {
 
 const TransactionsPage = () => {
   const [variant, setVariant] = useState<VARIANTS>(VARIANTS.LIST)
+  const [importResults, setImportResults] = useState(INITIAL_IMPORT_RESULTS)
 
   const newTransaction = useNewTransaction()
   const deleteTransactions = useBulkDeleteTransactions()
@@ -32,6 +34,17 @@ const TransactionsPage = () => {
   const transactions = transactionsQuery.data || []
 
   const isDisabled = transactionsQuery.isLoading || deleteTransactions.isPending
+
+  const onUpload = (results: typeof INITIAL_IMPORT_RESULTS) => {
+    console.log({ results })
+    setImportResults(results)
+    setVariant(VARIANTS.IMPORT)
+  }
+
+  const onCancelImport = () => {
+    setImportResults(INITIAL_IMPORT_RESULTS)
+    setVariant(VARIANTS.LIST)
+  }
 
   if (transactionsQuery.isLoading) {
     return (
@@ -53,7 +66,11 @@ const TransactionsPage = () => {
   if (variant === VARIANTS.IMPORT) {
     return (
       <>
-        <div>This is a screen for import</div>
+        <ImportCard
+          data={importResults.data}
+          onCancel={onCancelImport}
+          onSubmit={() => {}}
+        />
       </>
     )
   }
@@ -70,7 +87,7 @@ const TransactionsPage = () => {
               <Plus className="size-4 mr-2" />
               Add new
             </Button>
-            <UploadButton onUpload={() => {}} />
+            <UploadButton onUpload={onUpload} />
           </div>
         </CardHeader>
         <CardContent>
