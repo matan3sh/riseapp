@@ -1,6 +1,7 @@
 'use client'
 
 import { columns } from '@/app/(dashboard)/transactions/columns'
+import UploadButton from '@/app/(dashboard)/transactions/upload-button'
 import { DataTable } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -9,8 +10,22 @@ import { useBulkDeleteTransactions } from '@/features/transactions/api/use-bulk-
 import { useGetTransactions } from '@/features/transactions/api/use-get-transactions'
 import { useNewTransaction } from '@/features/transactions/hooks/use-new-transaction'
 import { Loader2, Plus } from 'lucide-react'
+import { useState } from 'react'
+
+enum VARIANTS {
+  LIST = 'LIST',
+  IMPORT = 'IMPORT',
+}
+
+const INITIAL_IMPORT_RESULTS = {
+  data: [],
+  errors: [],
+  meta: [],
+}
 
 const TransactionsPage = () => {
+  const [variant, setVariant] = useState<VARIANTS>(VARIANTS.LIST)
+
   const newTransaction = useNewTransaction()
   const deleteTransactions = useBulkDeleteTransactions()
   const transactionsQuery = useGetTransactions()
@@ -35,6 +50,14 @@ const TransactionsPage = () => {
     )
   }
 
+  if (variant === VARIANTS.IMPORT) {
+    return (
+      <>
+        <div>This is a screen for import</div>
+      </>
+    )
+  }
+
   return (
     <div className="max-w-screen-2xl mx-auto w-full pb-10 -mt-24">
       <Card className="border-none drop-shadow-sm">
@@ -42,10 +65,13 @@ const TransactionsPage = () => {
           <CardTitle className="text-xl line-clamp-1">
             Transactions history
           </CardTitle>
-          <Button onClick={newTransaction.onOpen} size="sm">
-            <Plus className="size-4 mr-2" />
-            Add new Transaction
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button onClick={newTransaction.onOpen} size="sm">
+              <Plus className="size-4 mr-2" />
+              Add new
+            </Button>
+            <UploadButton onUpload={() => {}} />
+          </div>
         </CardHeader>
         <CardContent>
           <DataTable
