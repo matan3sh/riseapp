@@ -1,7 +1,7 @@
 'use client'
 
 import { columns } from '@/app/(dashboard)/transactions/columns'
-import ImportCard from '@/app/(dashboard)/transactions/import-card'
+import { ImportCard } from '@/app/(dashboard)/transactions/import-card'
 import UploadButton from '@/app/(dashboard)/transactions/upload-button'
 import { DataTable } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
