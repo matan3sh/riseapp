@@ -1,11 +1,27 @@
 import { createId } from '@paralleldrive/cuid2'
+import { subDays } from 'date-fns'
 import { db } from '../db/drizzle'
 import { accounts, categories, transactions } from '../db/schema'
 
-const DEMO_USER_ID = 'user_2g3q2YVFPuSX68W4RDDGx4d2ozb' // Example Clerk user ID
+const DEMO_USER_ID = 'user_2g3q2YVFPuSX68W4RDDGx4d2ozb' // Your current Clerk user ID
+
+// Helper function to get a random date between two dates
+function getRandomDate(start: Date, end: Date) {
+  return new Date(
+    start.getTime() + Math.random() * (end.getTime() - start.getTime())
+  )
+}
+
+// Helper function to get a date within the last N days
+function getDateWithinLastDays(daysAgo: number) {
+  const end = new Date() // now
+  const start = subDays(end, daysAgo)
+  return getRandomDate(start, end)
+}
 
 async function seed() {
   console.log('🌱 Starting seeding...')
+  console.log('Using user ID:', DEMO_USER_ID)
 
   // Clear existing data
   await db.delete(transactions)
@@ -25,7 +41,10 @@ async function seed() {
     .insert(accounts)
     .values(accountsData)
     .returning()
-  console.log('💳 Created accounts:', insertedAccounts.length)
+  console.log(
+    '💳 Created accounts:',
+    insertedAccounts.map((a) => ({ id: a.id, name: a.name, userId: a.userId }))
+  )
 
   // Seed categories
   const categoriesData = [
@@ -43,15 +62,22 @@ async function seed() {
     .insert(categories)
     .values(categoriesData)
     .returning()
-  console.log('🏷️ Created categories:', insertedCategories.length)
+  console.log(
+    '🏷️ Created categories:',
+    insertedCategories.map((c) => ({
+      id: c.id,
+      name: c.name,
+      userId: c.userId,
+    }))
+  )
 
-  // Generate some sample transactions
+  // Generate some sample transactions with dates within the last 30 days
   const transactionsData = [
     {
       id: createId(),
       amount: 5000, // $50.00
       payee: 'Walmart',
-      date: new Date('2024-03-15'),
+      date: getDateWithinLastDays(2), // Random date within last 2 days
       accountId: insertedAccounts[0].id,
       categoryId: insertedCategories[0].id, // Groceries
       notes: 'Weekly grocery shopping',
@@ -60,7 +86,7 @@ async function seed() {
       id: createId(),
       amount: 150000, // $1,500.00
       payee: 'Landlord',
-      date: new Date('2024-03-01'),
+      date: getDateWithinLastDays(7), // Random date within last week
       accountId: insertedAccounts[0].id,
       categoryId: insertedCategories[1].id, // Rent
       notes: 'Monthly rent',
@@ -69,7 +95,7 @@ async function seed() {
       id: createId(),
       amount: 12000, // $120.00
       payee: 'Electric Company',
-      date: new Date('2024-03-05'),
+      date: getDateWithinLastDays(14), // Random date within last 2 weeks
       accountId: insertedAccounts[0].id,
       categoryId: insertedCategories[2].id, // Utilities
       notes: 'Monthly electricity bill',
@@ -78,7 +104,7 @@ async function seed() {
       id: createId(),
       amount: 500000, // $5,000.00
       payee: 'Employer',
-      date: new Date('2024-03-01'),
+      date: getDateWithinLastDays(21), // Random date within last 3 weeks
       accountId: insertedAccounts[1].id,
       categoryId: insertedCategories[7].id, // Income
       notes: 'Monthly salary',
@@ -87,7 +113,7 @@ async function seed() {
       id: createId(),
       amount: 7500, // $75.00
       payee: 'Amazon',
-      date: new Date('2024-03-10'),
+      date: getDateWithinLastDays(28), // Random date within last 4 weeks
       accountId: insertedAccounts[2].id,
       categoryId: insertedCategories[5].id, // Shopping
       notes: 'Online shopping',
@@ -98,7 +124,17 @@ async function seed() {
     .insert(transactions)
     .values(transactionsData)
     .returning()
-  console.log('💸 Created transactions:', insertedTransactions.length)
+  console.log(
+    '💸 Created transactions:',
+    insertedTransactions.map((t) => ({
+      id: t.id,
+      payee: t.payee,
+      amount: t.amount,
+      date: t.date.toISOString(),
+      accountId: t.accountId,
+      categoryId: t.categoryId,
+    }))
+  )
 
   console.log('✅ Seeding completed!')
   process.exit(0)
